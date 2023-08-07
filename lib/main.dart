@@ -1,93 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart'; // Correct import for math_expressions
 
-class Product {
-  const Product({required this.name});
+void main() => runApp(CalculatorApp());
 
-  final String name;
-}
-
-typedef CartChangedCallback = Function(Product product, bool inCart);
-
-class ShoppingListItem extends StatelessWidget {
-  ShoppingListItem({
-    required this.product,
-    required this.inCart,
-    required this.onCartChanged,
-  }) : super(key: ObjectKey(product));
-
-  final Product product;
-  final bool inCart;
-  final CartChangedCallback onCartChanged;
-
-  Color _getColor(BuildContext context) {
-    // The theme depends on the BuildContext because different
-    // parts of the tree can have different themes.
-    // The BuildContext indicates where the build is
-    // taking place and therefore which theme to use.
-
-    return inCart //
-        ? Colors.black54
-        : Theme.of(context).primaryColor;
-  }
-
-  TextStyle? _getTextStyle(BuildContext context) {
-    if (!inCart) return null;
-
-    return const TextStyle(
-      color: Colors.black54,
-      decoration: TextDecoration.lineThrough,
-    );
-  }
-
+class CalculatorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () {
-        onCartChanged(product, inCart);
-      },
-      leading: CircleAvatar(
-        backgroundColor: _getColor(context),
-        child: Text(product.name[0]),
-      ),
-      title: Text(
-        product.name,
-        style: _getTextStyle(context),
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: CalculatorScreen(),
     );
   }
 }
 
-class ShoppingList extends StatefulWidget {
-  const ShoppingList({required this.products, super.key});
-
-  final List<Product> products;
-
-  // The framework calls createState the first time
-  // a widget appears at a given location in the tree.
-  // If the parent rebuilds and uses the same type of
-  // widget (with the same key), the framework re-uses
-  // the State object instead of creating a new State object.
-
+class CalculatorScreen extends StatefulWidget {
   @override
-  State<ShoppingList> createState() => _ShoppingListState();
+  _CalculatorScreenState createState() => _CalculatorScreenState();
 }
 
-class _ShoppingListState extends State<ShoppingList> {
-  final _shoppingCart = <Product>{};
+class _CalculatorScreenState extends State<CalculatorScreen> {
+  String _input = '';
+  double _result = 0.0;
 
-  void _handleCartChanged(Product product, bool inCart) {
+  void _onButtonPressed(String buttonText) {
     setState(() {
-      // When a user changes what's in the cart, you need
-      // to change _shoppingCart inside a setState call to
-      // trigger a rebuild.
-      // The framework then calls build, below,
-      // which updates the visual appearance of the app.
-
-      if (!inCart) {
-        _shoppingCart.add(product);
+      if (buttonText == '=') {
+        _calculateResult();
+      } else if (buttonText == 'C') {
+        _clearInput();
       } else {
-        _shoppingCart.remove(product);
+        _input += buttonText;
       }
+    });
+  }
+
+  void _calculateResult() {
+    try {
+      Parser p = Parser();
+      Expression exp = p.parse(_input);
+      ContextModel cm = ContextModel();
+      _result = exp.evaluate(EvaluationType.REAL, cm);
+      _input = _result.toString();
+    } catch (e) {
+      _input = 'Error';
+    }
+  }
+
+  void _clearInput() {
+    setState(() {
+      _input = '';
+      _result = 0.0;
     });
   }
 
@@ -95,31 +57,69 @@ class _ShoppingListState extends State<ShoppingList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Shopping List'),
+        title: Text('Simple Calculator'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        children: widget.products.map((product) {
-          return ShoppingListItem(
-            product: product,
-            inCart: _shoppingCart.contains(product),
-            onCartChanged: _handleCartChanged,
-          );
-        }).toList(),
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(16.0),
+              alignment: Alignment.bottomRight,
+              child: Text(
+                _input,
+                style: TextStyle(fontSize: 40.0, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          Divider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildButton('7'),
+              _buildButton('8'),
+              _buildButton('9'),
+              _buildButton('/'),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildButton('4'),
+              _buildButton('5'),
+              _buildButton('6'),
+              _buildButton('*'),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildButton('1'),
+              _buildButton('2'),
+              _buildButton('3'),
+              _buildButton('-'),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildButton('0'),
+              _buildButton('C'),
+              _buildButton('='),
+              _buildButton('+'),
+            ],
+          ),
+        ],
       ),
     );
   }
-}
 
-void main() {
-  runApp(const MaterialApp(
-    title: 'Shopping App',
-    home: ShoppingList(
-      products: [
-        Product(name: 'Eggs'),
-        Product(name: 'Flour'),
-        Product(name: 'Chocolate chips'),
-      ],
-    ),
-  ));
+  Widget _buildButton(String buttonText) {
+    return ElevatedButton(
+      onPressed: () => _onButtonPressed(buttonText),
+      child: Text(
+        buttonText,
+        style: TextStyle(fontSize: 20.0),
+      ),
+    );
+  }
 }
