@@ -1,125 +1,137 @@
 import 'package:flutter/material.dart';
-import 'package:math_expressions/math_expressions.dart'; // Correct import for math_expressions
 
-void main() => runApp(CalculatorApp());
+void main() {
+  runApp(const MyApp());
+}
 
-class CalculatorApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: CalculatorScreen(),
+      title: 'Flutter Demo',
+      theme: ThemeData(
+
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(),
     );
   }
 }
 
-class CalculatorScreen extends StatefulWidget {
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key}) :  super(key:key);
+
+
   @override
-  _CalculatorScreenState createState() => _CalculatorScreenState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _CalculatorScreenState extends State<CalculatorScreen> {
-  String _input = '';
-  double _result = 0.0;
-
-  void _onButtonPressed(String buttonText) {
-    setState(() {
-      if (buttonText == '=') {
-        _calculateResult();
-      } else if (buttonText == 'C') {
-        _clearInput();
-      } else {
-        _input += buttonText;
-      }
-    });
-  }
-
-  void _calculateResult() {
-    try {
-      Parser p = Parser();
-      Expression exp = p.parse(_input);
-      ContextModel cm = ContextModel();
-      _result = exp.evaluate(EvaluationType.REAL, cm);
-      _input = _result.toString();
-    } catch (e) {
-      _input = 'Error';
-    }
-  }
-
-  void _clearInput() {
-    setState(() {
-      _input = '';
-      _result = 0.0;
-    });
-  }
+class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Simple Calculator'),
-      ),
-      body: Column(
-        children: [
-          Expanded(
+        appBar: AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text('Uttam'),
+        ),
+        body: Center(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
             child: Container(
-              padding: EdgeInsets.all(16.0),
-              alignment: Alignment.bottomRight,
-              child: Text(
-                _input,
-                style: TextStyle(fontSize: 40.0, fontWeight: FontWeight.bold),
+              color: Color.fromRGBO(200,122,9, 100),
+              height: 412,
+              width: 412,
+              child: SingleChildScrollView(
+                child: Column(
+                  //mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Row(
+                      //mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(3.0),
+                          child: InkWell(
+                            onTap: (){
+                              print('+');
+                            },
+                            child: Container(
+                              width: 200,
+                              height: 200,
+                              color: Colors.amber,
+                              child: Center(child: Text('+', style: TextStyle(fontSize: 100,color: Colors.white, fontWeight: FontWeight.w700),)),
+
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(3.0),
+                          child: InkWell(
+                            onTap: (){
+                              print('-');
+                            },
+                            child: Container(
+                              width: 200,
+                              height: 200,
+                              color: Colors.amber,
+                              child: Center(child: Text('-', style: TextStyle(fontSize: 100,color: Colors.white, fontWeight: FontWeight.w700),)),
+
+
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      //mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(3.0),
+                          child: InkWell(
+                            onTap: (){
+                              print('*');
+                            },
+                            child: Container(
+                              width: 200,
+                              height: 200,
+                              color: Colors.amber,
+                              child: Center(child: Text('x', style: TextStyle(fontSize: 100,color: Colors.white, fontWeight: FontWeight.w700),)),
+
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(3.0),
+                          child: InkWell(
+                            onTap: (){
+                              print('=');
+                            },
+                            child: Container(
+                              width: 200,
+                              height: 200,
+                              color: Color.fromRGBO(228,228,228, 100),
+                              child: Center(child: Text('=', style: TextStyle(fontSize: 100,color: Color.fromRGBO(120,120,120, 100), fontWeight: FontWeight.w700),)),
+
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-          Divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildButton('7'),
-              _buildButton('8'),
-              _buildButton('9'),
-              _buildButton('/'),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildButton('4'),
-              _buildButton('5'),
-              _buildButton('6'),
-              _buildButton('*'),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildButton('1'),
-              _buildButton('2'),
-              _buildButton('3'),
-              _buildButton('-'),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildButton('0'),
-              _buildButton('C'),
-              _buildButton('='),
-              _buildButton('+'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+        )
 
-  Widget _buildButton(String buttonText) {
-    return ElevatedButton(
-      onPressed: () => _onButtonPressed(buttonText),
-      child: Text(
-        buttonText,
-        style: TextStyle(fontSize: 20.0),
-      ),
-    );
+    ); // This trailing comma makes auto-formatting nicer for build methods.
+
   }
 }
