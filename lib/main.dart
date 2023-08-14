@@ -39,19 +39,25 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: Text('Uttam'),
+          title: Text('Roll: 2010876149'),
         ),
         body: Center(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Container(
               color: Color.fromRGBO(200,122,9, 100),
-              height: 412,
+              height: 472,
               width: 412,
               child: SingleChildScrollView(
                 child: Column(
                   //mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder()
+                      ),
+
+                    ),
                     Row(
                       //mainAxisAlignment: MainAxisAlignment.spaceAround,
 
